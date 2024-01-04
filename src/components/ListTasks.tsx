@@ -1,20 +1,25 @@
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import { faEdit } from "@fortawesome/free-solid-svg-icons";
+import { faTimes, faEdit } from "@fortawesome/free-solid-svg-icons";
 import toast from "react-hot-toast";
 import { useDrag, useDrop } from "react-dnd";
 import Modal from "./Modal";
+import { v4 as uuidv4 } from 'uuid'; // Импорт uuid
 
-const ListTasks = ({ tasks, setTasks }) => {
-  const [todos, setTodos] = useState([]);
-  const [inProgress, setInProgress] = useState([]);
-  const [closed, setClosed] = useState([]);
+interface TaskType {
+  id: string;
+  name: string;
+  status: string;
+}
+
+const ListTasks: React.FC<{ tasks: TaskType[], setTasks: React.Dispatch<React.SetStateAction<TaskType[]>> }> = ({ tasks, setTasks }) => {
+  const [todos, setTodos] = useState<TaskType[]>([]);
+  const [inProgress, setInProgress] = useState<TaskType[]>([]);
+  const [closed, setClosed] = useState<TaskType[]>([]);
 
   useEffect(() => {
     const fTodos = tasks.filter((task) => task.status === "todo");
     const fInProgress = tasks.filter((task) => task.status === "inprogress");
-
     const fClosed = tasks.filter((task) => task.status === "closed");
 
     setTodos(fTodos);
@@ -43,11 +48,11 @@ const ListTasks = ({ tasks, setTasks }) => {
 
 export default ListTasks;
 
-const Section = ({ status, tasks, setTasks, todos, inProgress, closed }) => {
+const Section: React.FC<{ status: string, tasks: TaskType[], setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>, todos: TaskType[], inProgress: TaskType[], closed: TaskType[] }> = ({ status, tasks, setTasks, todos, inProgress, closed }) => {
   const [{ isOver }, drop] = useDrop(
     () => ({
       accept: "task",
-      drop: (item) => addItemToSection(item.id, status),
+      drop: (item: { id: string }) => addItemToSection(item.id, status),
       collect: (monitor) => ({
         isOver: !!monitor.isOver(),
       }),
@@ -68,7 +73,7 @@ const Section = ({ status, tasks, setTasks, todos, inProgress, closed }) => {
     tasksToMap = closed;
   }
 
-  const addItemToSection = (id, status) => {
+  const addItemToSection = (id: string, status: string) => {
     setTasks((prev) => {
       const updatedTasks = prev.map((t) => {
         if (t.id === id) {
@@ -99,8 +104,8 @@ const Section = ({ status, tasks, setTasks, todos, inProgress, closed }) => {
   );
 };
 
-const Header = ({ text, count, status }) => {
-  let bgStyle = {};
+const Header: React.FC<{ text: string, count: number, status: string }> = ({ text, count, status }) => {
+  let bgStyle: React.CSSProperties = {};
 
   if (status === "inprogress") {
     bgStyle.background = "red";
@@ -118,11 +123,10 @@ const Header = ({ text, count, status }) => {
   );
 };
 
-const Task = ({ task, tasks, setTasks }) => {
-  const [editedTaskName, setEditedTaskName] = useState(task.name);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [draggingEnabled, setDraggingEnabled] = useState(true);
-
+const Task: React.FC<{ task: TaskType, tasks: TaskType[], setTasks: React.Dispatch<React.SetStateAction<TaskType[]>> }> = ({ task, tasks, setTasks }) => {
+  const [editedTaskName, setEditedTaskName] = useState<string>(task.name);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [draggingEnabled, setDraggingEnabled] = useState<boolean>(true);
 
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "task",
@@ -142,11 +146,11 @@ const Task = ({ task, tasks, setTasks }) => {
     setDraggingEnabled(true);
   };
 
-  const handleTaskNameChange = (e) => {
+  const handleTaskNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEditedTaskName(e.target.value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (editedTaskName.length < 3) {
