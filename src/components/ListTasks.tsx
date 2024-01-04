@@ -181,7 +181,7 @@ const Task: React.FC<{ task: TaskType, tasks: TaskType[], setTasks: React.Dispat
 
   return (
     <div ref={drag} className="list-li" draggable={draggingEnabled}>
-      <div>{task.name}</div>
+      <div className="list-name">{task.name}</div>
       <div className="list-btns">
         <button className="list-edit">
           <FontAwesomeIcon icon={faEdit} onClick={openModal} />
