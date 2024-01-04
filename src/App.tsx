@@ -9,8 +9,6 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 function App() {
   const [tasks, setTasks] = useState([]);
 
-  console.log("tasks", tasks);
-
   useEffect(() => {
     const storedTasks = localStorage.getItem("tasks");
     if (storedTasks) {

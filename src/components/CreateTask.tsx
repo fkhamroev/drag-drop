@@ -1,31 +1,39 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { v4 as uuidv4 } from "uuid";
 
+interface Task {
+  id: string;
+  name: string;
+  status: string;
+}
 
+interface CreateTaskProps {
+  tasks: Task[];
+  setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+}
 
-const CreateTask = ({ tasks, setTasks }) => {
-  const [task, setTask] = useState({
+const CreateTask: React.FC<CreateTaskProps> = ({ tasks, setTasks }) => {
+  const [task, setTask] = useState<Task>({
     id: "",
     name: "",
     status: "todo",
   });
 
-  console.log(task);
-
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (task.name.length < 3)
       return toast.error("A task must have more than 3 characters");
-      if (task.name.length > 100)
+    if (task.name.length > 100)
       return toast.error("A task must not be more than 100 characters");
+
     setTasks((prev) => {
       const list = [...prev, task];
       localStorage.setItem("tasks", JSON.stringify(list));
       return list;
     });
 
-    toast.success("Task created")
+    toast.success("Task created");
     setTask({
       id: "",
       name: "",
@@ -43,7 +51,9 @@ const CreateTask = ({ tasks, setTasks }) => {
           setTask({ ...task, id: uuidv4(), name: e.target.value });
         }}
       />
-      <button className="btn">Create</button>
+      <button type="submit" className="btn">
+        Create
+      </button>
     </form>
   );
 };
